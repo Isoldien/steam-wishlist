@@ -1,6 +1,5 @@
 import menu 
-import steam_id
-from steam_id import *
+import steam_user
+from steam_user import *
 
-menu.start()
-steam_id.userSearch()
+# Load menu
