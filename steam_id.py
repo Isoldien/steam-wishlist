@@ -5,7 +5,7 @@ KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS
 steam = Steam(KEY)
 
 def userSearch() :
-    global name
+    global name, search
     name = input('What is your Steam Username?' + '\n')
     search = steam.users.search_user(name)
-    return search, name
+    return name, search
