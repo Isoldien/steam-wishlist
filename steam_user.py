@@ -1,7 +1,6 @@
 import os
 from steam_web_api import Steam
 import csv
-import pandas as pd
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
@@ -18,15 +17,27 @@ def dictToCSV() :
     # @TODO add exception if directory exists 
     # @TODO add exception if file already exists
 
+    # This will do for now i suppose
+    if os.path.exists(os.path.join(os.getcwd(), 'csv', 'search_results.csv')) :
+        print("Directory and File already exists! Delete them manually!")
+
     # create directory and filename
     os.mkdir("csv")
-    csv_filename = "csv/search_results"
+    csv_filename = "csv/search_results.csv"
 
-    # convert dict to csv
-    with open(csv_filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(search.keys())
-        writer.writerow(search.values())
+    # extract data from nested results
+    steam_data = search["player"]
+    fieldnames = list(steam_data.keys())
+
+    # convert dict to csv 
+    with open(csv_filename, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow(steam_data)
+
+
+
+
     
 
 
