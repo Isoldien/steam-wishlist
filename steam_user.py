@@ -10,6 +10,7 @@ def userSearch() :
     global name, search
     name = str(input('What is your Steam Username?' + '\n'))
     search = steam.users.search_user(name)
+    print(steam.apps.get_app_details(1796470))
     return name, search
 
 # convert dictioniary to CSV

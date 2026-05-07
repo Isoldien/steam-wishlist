@@ -6,7 +6,7 @@ def getSteamID() :
     df = pd.read_csv('csv/search_results.csv')
     df = df.filter(['steamid'])
 
-    steamID = int(df['steamid'][0])
+    steamID = str(df['steamid'][0])
 
     return steamID
 
