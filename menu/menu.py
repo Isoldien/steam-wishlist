@@ -1,6 +1,6 @@
 #pymenu
 from pymenu import Menu
-import steam_user
+import logic.steam_logic as steam_logic
 
 # Menu 
 def start():
@@ -14,4 +14,4 @@ def start():
 |___/\__\___|\__,_|_| |_| |_|      \_/\_/ |_|___/_| |_|_|_|___/\__| |
 --------------------------------------------------------------------
 """
-    print(title)
+    print(title)    
