@@ -10,7 +10,7 @@ def userSearch() :
     global name, search
     name = str(input('What is your Steam Username?' + '\n'))
     search = steam.users.search_user(name)
-    print(steam.apps.get_app_details(1796470))
+    # print(steam.apps.get_app_details(1796470))
     return name, search
 
 # convert dictioniary to CSV
@@ -20,8 +20,8 @@ def dictToCSV() :
 
     # This will do for now i suppose
     if os.path.exists(os.path.join(os.getcwd(), 'csv', 'search_results.csv')) :
-        print("Directory and File already exists! Delete them manually!")
-
+        print("Directory and File already exists! Deleting them...")
+        os.system('rm -rf csv') # LMAO
     # create directory and filename
     os.mkdir("csv")
     csv_filename = "csv/search_results.csv"
