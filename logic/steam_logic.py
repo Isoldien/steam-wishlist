@@ -46,8 +46,12 @@ def getSteamID() :
     return steamID 
 
 def getWishlist() :
-    global wishlist
     wishlist = steam.users.get_profile_wishlist(steamID)
+    # iterate through wishlist
+    for games in wishlist :
+        appid = games['appid']
+        print(steam.apps.get_app_details(appid))
+
 
 
 
