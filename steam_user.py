@@ -20,8 +20,8 @@ def dictToCSV() :
 
     # This will do for now i suppose
     if os.path.exists(os.path.join(os.getcwd(), 'csv', 'search_results.csv')) :
-        print("Directory and File already exists! Deleting them...")
-        os.system('rm -rf csv') # LMAO
+        os.system('rm -rf csv')
+        print("Directory and File already exists! Deleting them..." + '\n')
     # create directory and filename
     os.mkdir("csv")
     csv_filename = "csv/search_results.csv"
