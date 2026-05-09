@@ -60,9 +60,10 @@ def getWishlist() :
         data = r.json() 
         game_data = data[str(appid)]['data']
         names = game_data.get('name', 'Name not found!')
-        prices = game_data.get('price_overview').get('final')
-        
-        print(prices)
+        prices = game_data.get('price_overview').get('final') / 100
+
+        print(f'{names}: £{prices}')
+
 
 
     
