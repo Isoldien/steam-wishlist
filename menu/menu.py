@@ -14,4 +14,6 @@ def start():
 |___/\__\___|\__,_|_| |_| |_|      \_/\_/ |_|___/_| |_|_|_|___/\__| |
 --------------------------------------------------------------------
 """
-    print(title)    
+    menu = Menu(title)
+    menu.add_option("Run Program", lambda: steam_logic.search())
+    menu.show()

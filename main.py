@@ -3,6 +3,3 @@ import logic.steam_logic as steam_logic
 
 # start the menu
 menu.start()
-
-# call main loop
-steam_logic.search()
