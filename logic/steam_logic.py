@@ -61,9 +61,18 @@ def getWishlist() :
         game_data = data[str(appid)]['data']
         names = game_data.get('name', 'Name not found!')
         prices = game_data.get('price_overview').get('final') / 100
+        rounded_prices = round(prices, 2)
+        print(f'{names}: £{rounded_prices}')
 
-        print(f'{names}: £{prices}')
-
+def search() :
+    while True :
+        userSearch()
+        if name == "-1" :
+            print("Exiting...")
+            break
+        getSteamID()
+        getWishlist()
+        print('\n')
 
 
     
