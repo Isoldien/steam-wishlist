@@ -3,6 +3,7 @@ from steam_web_api import Steam
 import csv
 import pandas as pd
 import requests
+import math
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
@@ -10,7 +11,7 @@ steam = Steam(KEY)
 # search for a user 
 def userSearch() :
     global name, search
-    name = str(input('What is your Steam Username?' + '\n'))
+    name = str(input('What is your Steam Username? (type -1 to exit)' + '\n'))
     search = steam.users.search_user(name)
     # print(steam.apps.get_app_details(1796470))
     return name, search
@@ -30,6 +31,10 @@ def getSteamID() :
     csv_filename = "csv/search_results.csv"
 
     # extract data from nested results
+    if not isinstance(search, dict) or "player" not in search:
+        print("Error: Invalid user search result. User may not exist or API returned unexpected data.")
+        return None
+    
     steam_data = search["player"]
     fieldnames = list(steam_data.keys())
 
@@ -43,12 +48,11 @@ def getSteamID() :
     df = pd.read_csv('csv/search_results.csv')
     df = df.filter(['steamid'])
     steamID = str(df['steamid'][0])
-
     return steamID 
 
 def getWishlist() :
     wishlist = steam.users.get_profile_wishlist(steamID)
-    
+    total_price = 0
     # iterate through wishlist
     for games in wishlist :
         appid = games['appid']
@@ -60,9 +64,15 @@ def getWishlist() :
         data = r.json() 
         game_data = data[str(appid)]['data']
         names = game_data.get('name', 'Name not found!')
-        prices = game_data.get('price_overview').get('final') / 100
-        rounded_prices = round(prices, 2)
-        print(f'{names}: £{rounded_prices}')
+        price_overview = game_data.get('price_overview')
+
+        if price_overview is None:
+            print(f'{names}: Price not available')
+            continue
+
+        price = price_overview.get('final', 0) / 100
+        total_price = price + total_price
+        print(f'£{total_price:.2f}')
 
 def search() :
     while True :
@@ -70,7 +80,9 @@ def search() :
         if name == "-1" :
             print("Exiting...")
             break
-        getSteamID()
+        if getSteamID() is None:
+            continue 
+        print(steamID)
         getWishlist()
         print('\n')
 
