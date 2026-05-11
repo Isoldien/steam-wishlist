@@ -3,7 +3,6 @@ from steam_web_api import Steam
 import csv
 import pandas as pd
 import requests
-import math
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
@@ -14,7 +13,6 @@ def userSearch() :
     name = str(input('What is your Steam Username? (type -1 to exit)' + '\n'))
     search = steam.users.search_user(name)
     # print(steam.apps.get_app_details(1796470))
-    return name, search
 
 # convert dictioniary to CSV
 def getSteamID() :
@@ -51,8 +49,18 @@ def getSteamID() :
     return steamID 
 
 def getWishlist() :
-    wishlist = steam.users.get_profile_wishlist(steamID)
-    total_price = 0
+    try:
+        wishlist = steam.users.get_profile_wishlist(steamID)
+    except KeyError as Error:
+        print(f"Error: Cannot access wishlist for this profile. The wishlist may be private or the API key may not have permission.")
+        return
+    
+    if wishlist is None or not wishlist:
+        print("Wishlist is empty or not accessible.")
+        return
+    
+    price_list = []
+    
     # iterate through wishlist
     for games in wishlist :
         appid = games['appid']
@@ -71,8 +79,9 @@ def getWishlist() :
             continue
 
         price = price_overview.get('final', 0) / 100
-        total_price = price + total_price
-        print(f'£{total_price:.2f}')
+        price_list.append(price)
+    
+    print(price_list)
 
 def search() :
     while True :
