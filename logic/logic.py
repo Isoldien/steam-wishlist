@@ -3,6 +3,7 @@ from steam_web_api import Steam
 import csv
 import pandas as pd
 import requests
+import multiprocessing
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
@@ -59,8 +60,7 @@ def getWishlist() :
         print("Wishlist is empty or not accessible.")
         return
     
-    price_list = []
-    
+    name_list = []
     # iterate through wishlist
     for games in wishlist :
         appid = games['appid']
@@ -71,17 +71,19 @@ def getWishlist() :
 
         data = r.json() 
         game_data = data[str(appid)]['data']
-        names = game_data.get('name', 'Name not found!')
+        name = game_data.get('name', 'Name not found!')
+        name_list.append(name)
+
         price_overview = game_data.get('price_overview')
 
         if price_overview is None:
-            print(f'{names}: Price not available')
+            print(f'{name}: Price not available')  
             continue
 
         price = price_overview.get('final', 0) / 100
-        price_list.append(price)
-    
-    print(price_list)
+
+        print(f'{name}: {price}')
+        
 
 def search() :
     while True :
@@ -90,8 +92,7 @@ def search() :
             print("Exiting...")
             break
         if getSteamID() is None:
-            continue 
-        print(steamID)
+            continue
         getWishlist()
         print('\n')
 

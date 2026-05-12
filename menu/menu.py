@@ -1,6 +1,6 @@
 #pymenu
 from pymenu import Menu
-import logic.steam_logic as steam_logic
+import logic.logic as logic
 
 # Menu 
 def start():
@@ -15,5 +15,5 @@ def start():
 --------------------------------------------------------------------
 """
     menu = Menu(title)
-    menu.add_option("Run Program", lambda: steam_logic.search())
+    menu.add_option("Run Program", lambda: logic.search())
     menu.show()
