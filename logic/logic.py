@@ -3,7 +3,6 @@ from steam_web_api import Steam
 import csv
 import pandas as pd
 import requests
-import multiprocessing
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
