@@ -1,8 +1,8 @@
-import os
-from steam_web_api import Steam
-import csv
+import os, csv, requests
 import pandas as pd
-import requests
+from steam_web_api import Steam
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
@@ -48,6 +48,7 @@ def getSteamID() :
     steamID = str(df['steamid'][0])
     return steamID 
 
+"""
 def getWishlist() :
     try:
         wishlist = steam.users.get_profile_wishlist(steamID)
@@ -83,6 +84,51 @@ def getWishlist() :
 
         print(f'{name}: {price}')
         
+"""
+def getWishlist() :
+    try:
+        wishlist = steam.users.get_profile_wishlist(steamID)
+    except KeyError:
+        print(f"Error: Cannot access wishlist for this profile. The wishlist may be private or the API key may not have permission.")
+        return
+    
+    if wishlist is None or not wishlist:
+        print("Wishlist is empty or not accessible.")
+        return
+    
+    # Extract appids from wishlist
+    appids = [game['appid'] for game in wishlist]
+
+    threads = os.cpu_count()
+    print(f'Thread Count: {threads}')
+
+    # Use ThreadPoolExecutor to fetch game details in parallel
+    with ThreadPoolExecutor(max_workers=threads) as executor:
+        results = executor.map(getGameDetails, appids)
+        # Process results as they complete
+        for game_name, price in results:
+            if price is None:
+                print(f'{game_name}: Price not available')
+            else:
+                print(f'{game_name}: {price}')
+
+def getGameDetails(appid) :
+    try:
+        r = requests.get(f'https://store.steampowered.com/api/appdetails?appids={appid}', params={'cc':'GB'})
+        data = r.json()
+        game_data = data[str(appid)]['data']
+        
+        game_name = game_data.get('name', 'Name not found!')
+        price_overview = game_data.get('price_overview')
+        
+        if price_overview is None:
+            return game_name, None
+        
+        price = price_overview.get('final', 0) / 100
+        return game_name, price
+    except Exception as e:
+        return f'Error fetching game {appid}', None
+
 
 def search() :
     while True :
@@ -92,7 +138,10 @@ def search() :
             break
         if getSteamID() is None:
             continue
+        start = time.time()
         getWishlist()
+        end = time.time()
+        print('time taken: ' end - start)
         print('\n')
 
 
