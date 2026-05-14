@@ -1,5 +1,4 @@
-import os, csv, requests
-import pandas as pd
+import os, json, requests
 from steam_web_api import Steam
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -14,19 +13,20 @@ def userSearch() :
     search = steam.users.search_user(name)
     # print(steam.apps.get_app_details(1796470))
 
-# convert dictioniary to CSV
+# convert dictionary to JSON and extract steamID
 def getSteamID() :
     global steamID
     # @TODO add exception if directory exists 
     # @TODO add exception if file already exists
 
     # This will do for now i suppose
-    if os.path.exists(os.path.join(os.getcwd(), 'csv', 'search_results.csv')) :
+    if os.path.exists(os.path.join(os.getcwd(), 'json', 'search_results.json')) :
         print("Directory and File already exists! Deleting them..." + '\n')
-        os.system('rm -rf csv')
+        os.system('rm -rf json')
+        
     # create directory and filename
-    os.mkdir("csv")
-    csv_filename = "csv/search_results.csv"
+    os.mkdir("json")
+    json_filename = "json/search_results.json"
 
     # extract data from nested results
     if not isinstance(search, dict) or "player" not in search:
@@ -34,57 +34,15 @@ def getSteamID() :
         return None
     
     steam_data = search["player"]
-    fieldnames = list(steam_data.keys())
 
-    # convert dict to csv 
-    with open(csv_filename, 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerow(steam_data)
+    # convert dict to json 
+    with open(json_filename, 'w') as jsonfile:
+        json.dump(steam_data, jsonfile, indent=2)
     
-    # clean CSV
-    df = pd.read_csv('csv/search_results.csv')
-    df = df.filter(['steamid'])
-    steamID = str(df['steamid'][0])
+    # extract steamID
+    steamID = str(steam_data['steamid'])
     return steamID 
 
-"""
-def getWishlist() :
-    try:
-        wishlist = steam.users.get_profile_wishlist(steamID)
-    except KeyError as Error:
-        print(f"Error: Cannot access wishlist for this profile. The wishlist may be private or the API key may not have permission.")
-        return
-    
-    if wishlist is None or not wishlist:
-        print("Wishlist is empty or not accessible.")
-        return
-    
-    name_list = []
-    # iterate through wishlist
-    for games in wishlist :
-        appid = games['appid']
-
-        #@TODO have a user selectable country code so users can choose where they live
-
-        r = requests.get(f'https://store.steampowered.com/api/appdetails?appids={appid}', params={'cc':'GB'})
-
-        data = r.json() 
-        game_data = data[str(appid)]['data']
-        name = game_data.get('name', 'Name not found!')
-        name_list.append(name)
-
-        price_overview = game_data.get('price_overview')
-
-        if price_overview is None:
-            print(f'{name}: Price not available')  
-            continue
-
-        price = price_overview.get('final', 0) / 100
-
-        print(f'{name}: {price}')
-        
-"""
 def getWishlist() :
     try:
         wishlist = steam.users.get_profile_wishlist(steamID)
@@ -141,7 +99,8 @@ def search() :
         start = time.time()
         getWishlist()
         end = time.time()
-        print('time taken: ' end - start)
+        time_taken = start - end
+        print(f'time taken: {time_taken}')
         print('\n')
 
 
