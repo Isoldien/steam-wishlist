@@ -11,19 +11,20 @@ def userSearch() :
     global name, search
     name = str(input('What is your Steam Username? (type -1 to exit)' + '\n'))
     search = steam.users.search_user(name)
-    # print(steam.apps.get_app_details(1796470))
 
 # convert dictionary to JSON and extract steamID
 def getSteamID() :
     global steamID
-    # @TODO add exception if directory exists 
-    # @TODO add exception if file already exists
+    try:
+        if os.path.exists("json/search_results.json"):
+            os.remove("json/search_results.json")
+        if os.path.exists("json"):
+            os.rmdir("json")
+    except FileNotFoundError as e:
+        print(f"Error: File or directory not found - {e}")
+    except OSError as e:
+        print(f"Error: Could not delete file or directory - {e}")
 
-    # This will do for now i suppose
-    if os.path.exists(os.path.join(os.getcwd(), 'json', 'search_results.json')) :
-        print("Directory and File already exists! Deleting them..." + '\n')
-        os.system('rm -rf json')
-        
     # create directory and filename
     os.mkdir("json")
     json_filename = "json/search_results.json"
@@ -58,8 +59,8 @@ def getWishlist() :
     appids = [game['appid'] for game in wishlist]
 
     threads = os.cpu_count()
-    print(f'Thread Count: {threads}')
-
+    
+    start = time.time()
     # Use ThreadPoolExecutor to fetch game details in parallel
     with ThreadPoolExecutor(max_workers=threads) as executor:
         results = executor.map(getGameDetails, appids)
@@ -67,8 +68,13 @@ def getWishlist() :
         for game_name, price in results:
             if price is None:
                 print(f'{game_name}: Price not available')
+                print("-----------------------------------")
             else:
-                print(f'{game_name}: {price}')
+                print(f'{game_name}: £{price}')
+                print("------------------------------------")
+    end = time.time()
+    time_taken = end - start
+    print(f'Time: {time_taken:.2f} seconds with {threads} threads')
 
 def getGameDetails(appid) :
     try:
@@ -96,11 +102,7 @@ def search() :
             break
         if getSteamID() is None:
             continue
-        start = time.time()
         getWishlist()
-        end = time.time()
-        time_taken = start - end
-        print(f'time taken: {time_taken}')
         print('\n')
 
 
