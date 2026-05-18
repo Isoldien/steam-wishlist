@@ -2,6 +2,7 @@ import os, json, requests
 from steam_web_api import Steam
 import time
 from concurrent.futures import ThreadPoolExecutor
+import tkinter
 
 KEY = os.environ.get("STEAM_WEB_API") # get key from system env, dependant on OS 
 steam = Steam(KEY)
