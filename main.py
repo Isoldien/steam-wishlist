@@ -1,3 +1,3 @@
-import menu.menu as menu
+from gui.home_screen import start as start_gui
 
-menu.start()
+start_gui()
